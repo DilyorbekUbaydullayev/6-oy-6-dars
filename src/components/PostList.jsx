@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axiosInstance from '../services/axiosInstance';
-import Loader from './Loader';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
+import Loader from './Loader.jsx'
 const PostList = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,9 +11,10 @@ const PostList = () => {
       .then(response => {
         setPosts(response.data);
         setLoading(false);
+        toast.success("Ma'lumotlar muvoffaqqiyatli olindi!");
       })
       .catch(error => {
-        toast.error('Failed to fetch posts');
+        toast.error('Postlarni olishda Xatolik!');
         setLoading(false);
       });
   }, []);
@@ -24,26 +23,36 @@ const PostList = () => {
     axiosInstance.delete(`/posts/${id}`)
       .then(() => {
         setPosts(posts.filter(post => post.id !== id));
-        toast.success('Post deleted successfully');
+        toast.success('Post muvoffaqqiyatli o`chirildi');
       })
       .catch(() => {
-        toast.error('Failed to delete post');
+        toast.error('Postni o`chirishda Xatolik');
       });
   };
 
   if (loading) {
-    return <Loader />;
+    return <div><Loader/></div>;
   }
 
   return (
-    <div>
-      {posts.map(post => (
-        <div key={post.id}>
-          <h2>{post.title}</h2>
-          <p>{post.body}</p>
-          <button onClick={() => deletePost(post.id)}>Delete</button>
-        </div>
-      ))}
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Posts</h1>
+      <ul className="space-y-4">
+        {posts.map(post => (
+          <li key={post.id} className="p-4 border rounded shadow-sm flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold">{post.title}</h2>
+              <p className="text-gray-700">{post.body}</p>
+            </div>
+            <button
+              onClick={() => deletePost(post.id)}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
